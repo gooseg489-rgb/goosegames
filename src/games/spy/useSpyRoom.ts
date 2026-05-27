@@ -731,31 +731,42 @@ export function useSpyRoom() {
     initDoneRef.current = true;
 
     const init = async () => {
-      if (urlRoomCode) clearSession();
+      const session = loadSession();
 
-      const session = urlRoomCode ? null : loadSession();
-      if (session?.roomId && session?.myId) {
-        const snap = await get(ref(db, `rooms/${session.roomId}`));
+      // Если зашли по ссылке с другим кодом — чужая комната, сбрасываем сессию
+      if (urlRoomCode && session?.roomId && session.roomId !== urlRoomCode) {
+        clearSession();
+      }
+
+      // Реконнект: если в URL есть код И сессия совпадает — реконнектимся
+      // Если URL пустой — используем сессию как обычно
+      const activeSession = (urlRoomCode && session?.roomId === urlRoomCode)
+        ? session
+        : urlRoomCode
+          ? null
+          : session;
+      if (activeSession?.roomId && activeSession?.myId) {
+        const snap = await get(ref(db, `rooms/${activeSession.roomId}`));
         if (snap.exists()) {
           const room = snap.val() as RoomState;
-          myIdRef.current = session.myId;
-          setMyId(session.myId);
-          myNameRef.current = session.myName;
-          roomIdRef.current = session.roomId;
-          setRoomId(session.roomId);
+          myIdRef.current = activeSession.myId;
+          setMyId(activeSession.myId);
+          myNameRef.current = activeSession.myName;
+          roomIdRef.current = activeSession.roomId;
+          setRoomId(activeSession.roomId);
           iAmHostRef.current =
-            session.iAmHost || room.hostId === session.myId;
-          setMyAvatar(session.myAvatar || AVATARS[0]);
+            activeSession.iAmHost || room.hostId === activeSession.myId;
+          setMyAvatar(activeSession.myAvatar || AVATARS[0]);
 
           const playerSnap = await get(
-            ref(db, `rooms/${session.roomId}/players/${session.myId}`),
+            ref(db, `rooms/${activeSession.roomId}/players/${activeSession.myId}`),
           );
           if (!playerSnap.exists()) {
             await set(
-              ref(db, `rooms/${session.roomId}/players/${session.myId}`),
+              ref(db, `rooms/${activeSession.roomId}/players/${activeSession.myId}`),
               {
-                name: session.myName,
-                avatar: session.myAvatar || "🕵️",
+                name: activeSession.myName,
+                avatar: activeSession.myAvatar || "🕵️",
                 isHost: iAmHostRef.current,
                 ready: false,
               },
@@ -766,7 +777,7 @@ export function useSpyRoom() {
 
           if (room.status === "playing" || room.status === "role_reveal") {
             const privSnap = await get(
-              ref(db, `rooms/${session.roomId}/private/${session.myId}`),
+              ref(db, `rooms/${activeSession.roomId}/private/${activeSession.myId}`),
             );
             if (privSnap.exists()) {
               const role = privSnap.val() as PlayerRole;
