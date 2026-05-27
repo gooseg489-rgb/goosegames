@@ -1,0 +1,326 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap");
+
+.home-page *,
+.home-page *::before,
+.home-page *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.home-page {
+  --bg: #0d0d0d;
+  --surface: #141414;
+  --card: #1a1a1a;
+  --border: #272727;
+  --border-hi: #3a3a3a;
+  --text: #f0ece4;
+  --muted: #666;
+  --muted-hi: #999;
+  --accent: #e8d5a3;
+  --accent-dim: #9a8c6a;
+
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Crimson Pro", Georgia, serif;
+  position: relative;
+}
+
+.home-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+.home-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+
+.home-page header {
+  padding: 3rem 0 2.5rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 3rem;
+}
+
+.home-page .logo-block .logo {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 4rem;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.home-page .logo-block .tagline {
+  font-size: 1rem;
+  color: var(--muted-hi);
+  font-style: italic;
+  margin-top: 0.2rem;
+}
+
+.home-page .header-badge {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  text-transform: uppercase;
+  text-align: right;
+  line-height: 1.6;
+}
+
+.home-page .header-badge span {
+  display: block;
+  color: var(--accent-dim);
+  font-size: 1.4rem;
+}
+
+.home-page .section-label {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-page .section-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.home-page .games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 3rem;
+}
+
+.home-page .game-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+
+.home-page .game-card:hover {
+  border-color: var(--border-hi);
+  transform: translateY(-3px);
+}
+
+.home-page .game-card:hover .card-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.home-page .card-art {
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.home-page .card-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 50%, var(--card));
+}
+
+.home-page .art-spy {
+  background: #0d0a08;
+}
+
+.home-page .art-spy .art-bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-page .art-spy .art-bg::before {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 1px solid #3a2e1a44;
+  top: -40px;
+  right: -40px;
+}
+
+.home-page .art-spy .art-bg::after {
+  content: "";
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 1px solid #3a2e1a33;
+  bottom: -20px;
+  left: -20px;
+}
+
+.home-page .art-emoji {
+  position: relative;
+  z-index: 1;
+  font-size: 4.5rem;
+  filter: drop-shadow(0 0 30px rgba(232, 213, 163, 0.15));
+}
+
+.home-page .art-soon {
+  background: #0d0d0d;
+}
+
+.home-page .art-soon .art-emoji {
+  opacity: 0.2;
+  font-size: 3.5rem;
+}
+
+.home-page .card-body {
+  padding: 1.25rem 1.5rem 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-page .card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.home-page .card-name {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  color: var(--text);
+}
+
+.home-page .card-arrow {
+  font-size: 1.2rem;
+  color: var(--accent);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: all 0.2s;
+}
+
+.home-page .card-desc {
+  font-size: 0.92rem;
+  color: var(--muted-hi);
+  font-style: italic;
+  line-height: 1.5;
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.home-page .card-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.home-page .tag {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border-hi);
+  color: var(--muted-hi);
+}
+
+.home-page .tag.accent {
+  border-color: #9a8c6a44;
+  color: var(--accent-dim);
+}
+
+.home-page .tag.new {
+  border-color: #27ae6044;
+  color: #5dbd85;
+}
+
+.home-page .game-card.soon {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
+.home-page .game-card.soon:hover {
+  transform: none;
+}
+
+.home-page footer {
+  border-top: 1px solid var(--border);
+  padding-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.home-page .footer-logo {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.home-page .footer-text {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+@media (max-width: 560px) {
+  .home-wrap {
+    padding: 0 1rem 3rem;
+  }
+
+  .home-page header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 2rem 0 1.5rem;
+  }
+
+  .home-page .logo-block .logo {
+    font-size: 3rem;
+  }
+
+  .home-page .header-badge {
+    text-align: left;
+  }
+
+  .home-page footer {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+}
