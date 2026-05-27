@@ -27,6 +27,12 @@ export default function SpyGame() {
   const myVoteSent =
     s.myId && s.roomState.playerVotes?.[s.myId as string];
 
+  const handleLeave = () => {
+    if (window.confirm("Выйти из комнаты?")) {
+      void s.leaveRoom();
+    }
+  };
+
   return (
     <div className="spy-app">
         <header>
@@ -56,6 +62,16 @@ export default function SpyGame() {
                 {s.roomId}
               </span>
             </div>
+          )}
+          {s.screen !== "join" && (
+            <button
+              type="button"
+              className="btn sm"
+              style={{ marginLeft: "auto", fontSize: "0.8rem" }}
+              onClick={handleLeave}
+            >
+              Выйти
+            </button>
           )}
         </header>
 
@@ -466,13 +482,6 @@ export default function SpyGame() {
                 Новый раунд →
               </button>
             )}
-            <button
-              type="button"
-              className="btn mt1"
-              onClick={() => void s.leaveRoom()}
-            >
-              На главную
-            </button>
           </Screen>
         </main>
 

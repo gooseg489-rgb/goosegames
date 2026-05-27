@@ -259,7 +259,14 @@ export function useSpyRoom() {
 
     const presenceRef = ref(db, `rooms/${roomId}/presence/${myId}`);
     set(presenceRef, true);
-    onDisconnect(presenceRef).remove();
+    // Хост получает 120 сек на реконнект — его presence не удаляется сразу
+    if (!iAmHostRef.current) {
+      onDisconnect(presenceRef).remove();
+    } else {
+      // Для хоста: помечаем время дисконнекта, не удаляем сразу
+      const hostDisconnectRef = ref(db, `rooms/${roomId}/hostDisconnectAt`);
+      onDisconnect(hostDisconnectRef).set(Date.now() + 120000);
+    }
 
     onValue(ref(db, `rooms/${roomId}/presence`), (snap) => {
       const online = snap.val() ? Object.keys(snap.val()).length : 0;
@@ -271,6 +278,36 @@ export function useSpyRoom() {
             }
           });
         }, 10000);
+      }
+    });
+
+    // Следим за сменой хоста: если hostId исчез из players — передаём хостство
+    onValue(ref(db, `rooms/${roomId}/hostId`), async (snap) => {
+      const currentHostId = snap.val() as string | null;
+      if (!currentHostId || !myIdRef.current) return;
+      const hostPlayerSnap = await get(ref(db, `rooms/${roomId}/players/${currentHostId}`));
+      if (!hostPlayerSnap.exists() && iAmHostRef.current) {
+        // Мы уже хост — ничего не делаем
+        return;
+      }
+      if (!hostPlayerSnap.exists()) {
+        // Хост пропал — первый онлайн игрок берёт хостство через 120 сек
+        setTimeout(async () => {
+          const hostStillGone = await get(ref(db, `rooms/${roomId}/players/${currentHostId}`));
+          if (!hostStillGone.exists()) {
+            const myPlayerSnap = await get(ref(db, `rooms/${roomId}/players/${myIdRef.current!}`));
+            if (!myPlayerSnap.exists()) return;
+            // Берём хостство если мы первый в списке
+            const allPlayersSnap = await get(ref(db, `rooms/${roomId}/players`));
+            const allPlayers = Object.keys(allPlayersSnap.val() || {});
+            if (allPlayers[0] === myIdRef.current) {
+              iAmHostRef.current = true;
+              await update(ref(db, `rooms/${roomId}`), { hostId: myIdRef.current });
+              await update(ref(db, `rooms/${roomId}/players/${myIdRef.current}`), { isHost: true });
+              persistSession();
+            }
+          }
+        }, 120000);
       }
     });
 
