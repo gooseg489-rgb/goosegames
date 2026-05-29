@@ -288,6 +288,14 @@ export default function SpyGame() {
           >
             Понял, играю! →
           </button>
+          <button
+            type="button"
+            className="btn mt1"
+            style={{ fontSize: "0.95rem" }}
+            onClick={() => void s.leaveRoom()}
+          >
+            Покинуть комнату
+          </button>
         </Screen>
 
         <Screen id="screen-game" active={s.screen === "game"}>

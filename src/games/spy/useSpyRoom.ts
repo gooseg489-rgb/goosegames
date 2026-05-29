@@ -177,6 +177,7 @@ export function useSpyRoom() {
     clearSession();
     myIdRef.current = null;
     roomIdRef.current = "";
+    initDoneRef.current = false;
     setMyId(null);
     setRoomId("");
     iAmHostRef.current = false;
@@ -185,8 +186,9 @@ export function useSpyRoom() {
     resetRoundState();
     setRoomState({});
     setScreen("join");
-    setJoinMode(urlRoomCode ? "quick" : "normal");
-  }, [resetRoundState, unsubscribeAll, urlRoomCode]);
+    setJoinMode("normal");
+    navigate("/spy", { replace: true });
+  }, [navigate, resetRoundState, unsubscribeAll]);
 
   const handleStateChange = useCallback(
     (state: RoomState) => {
