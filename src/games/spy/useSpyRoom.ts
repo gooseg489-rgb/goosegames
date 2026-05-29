@@ -579,25 +579,8 @@ export function useSpyRoom() {
     if (!roomId || !myId) return;
     await update(ref(db, `rooms/${roomId}/players/${myId}`), { ready: true });
     setScreen("game");
-
-    if (iAmHostRef.current) {
-      const playersRef = ref(db, `rooms/${roomId}/players`);
-      await new Promise<void>((resolve) => {
-        const unsub = onValue(playersRef, (snap) => {
-          const pl = Object.values(snap.val() || {}) as Player[];
-          if (pl.length > 0 && pl.every((p) => p.ready)) {
-            unsub();
-            resolve();
-          }
-        });
-      });
-      const timerMin = roomState.timerMin || 8;
-      await update(ref(db, `rooms/${roomId}`), {
-        status: "playing",
-        timerEnd: Date.now() + timerMin * 60 * 1000,
-      });
-    }
-  }, [roomState.timerMin]);
+    // Хост проверяет готовность всех в useEffect через roomState
+  }, []);
 
   const requestVote = useCallback(async () => {
     const roomId = roomIdRef.current;
@@ -725,6 +708,23 @@ export function useSpyRoom() {
       setScreen("role");
     }
   }, [roomState.status, roomState.startedAt]);
+
+  // Хост следит за готовностью всех игроков и запускает игру
+  useEffect(() => {
+    if (!iAmHostRef.current) return;
+    if (roomState.status !== "role_reveal") return;
+    const players = roomState.players ? Object.values(roomState.players) as Player[] : [];
+    if (players.length < 3) return;
+    if (players.every((p) => p.ready)) {
+      const roomId = roomIdRef.current;
+      if (!roomId) return;
+      const timerMin = roomState.timerMin || 8;
+      void update(ref(db, `rooms/${roomId}`), {
+        status: "playing",
+        timerEnd: Date.now() + timerMin * 60 * 1000,
+      });
+    }
+  }, [roomState.players, roomState.status, roomState.timerMin]);
 
   useEffect(() => {
     if (initDoneRef.current) return;
