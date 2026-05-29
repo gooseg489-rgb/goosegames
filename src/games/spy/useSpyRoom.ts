@@ -374,7 +374,13 @@ export function useSpyRoom() {
   const finalizeVote = useCallback(async () => {
     if (!iAmHostRef.current) return;
     if (votePhaseIntervalRef.current) clearInterval(votePhaseIntervalRef.current);
-    const votes = roomState.playerVotes || {};
+    const roomId = roomIdRef.current;
+    if (!roomId) return;
+    // Читаем свежие данные из Firebase
+    const freshSnap = await get(ref(db, `rooms/${roomId}`));
+    if (!freshSnap.exists()) return;
+    const freshRoom = freshSnap.val() as RoomState;
+    const votes = freshRoom.playerVotes || {};
     const tally: Record<string, number> = {};
     Object.values(votes).forEach((tid) => {
       tally[tid] = (tally[tid] || 0) + 1;
@@ -391,9 +397,9 @@ export function useSpyRoom() {
       await hostEndGame("time");
       return;
     }
-    const spyId = hostSpyIdRef.current || roomState._spyId || "";
+    const spyId = hostSpyIdRef.current || freshRoom._spyId || "";
     await hostEndGame(topId === spyId ? "caught" : "wrong", topId);
-  }, [hostEndGame, roomState]);
+  }, [hostEndGame]);
 
   const startVotePhase = useCallback(async () => {
     if (roomState.votePhase === "voting" || !roomRefObj.current) return;
@@ -503,6 +509,7 @@ export function useSpyRoom() {
     if (roomId && myId) {
       await remove(ref(db, `rooms/${roomId}/players/${myId}`));
       await remove(ref(db, `rooms/${roomId}/private/${myId}`));
+      await remove(ref(db, `rooms/${roomId}/presence/${myId}`));
     }
     backToJoin();
   }, [backToJoin, unsubscribeAll]);
@@ -523,10 +530,13 @@ export function useSpyRoom() {
 
   const hostStartGame = useCallback(async () => {
     const roomId = roomIdRef.current;
+    if (!roomId) return;
+    // Проверяем хостство напрямую из Firebase чтобы не зависеть от stale ref
+    const roomSnap = await get(ref(db, `rooms/${roomId}`));
+    if (!roomSnap.exists()) return;
+    const roomData = roomSnap.val() as RoomState;
     const myId = myIdRef.current;
-    const isHost = iAmHostRef.current;
-    if (!roomId) { alert('DEBUG: roomId пустой!'); return; }
-    if (!isHost) { alert('DEBUG: iAmHost = false! myId=' + myId); return; }
+    if (roomData.hostId !== myId) return;
     const snap = await get(ref(db, `rooms/${roomId}/players`));
     const players = Object.entries(snap.val() || {}) as [string, Player][];
     if (players.length < 3) {
@@ -611,8 +621,12 @@ export function useSpyRoom() {
       setModalVoteOpen(false);
 
       if (iAmHostRef.current) {
-        const players = Object.keys(roomState.players || {});
-        const votes = { ...roomState.playerVotes, [myId]: targetId };
+        // Читаем свежие данные из Firebase чтобы не было stale closure
+        const freshSnap = await get(ref(db, `rooms/${roomId}`));
+        if (!freshSnap.exists()) return;
+        const freshRoom = freshSnap.val() as RoomState;
+        const players = Object.keys(freshRoom.players || {});
+        const votes = { ...(freshRoom.playerVotes || {}), [myId]: targetId };
         const majority = Math.ceil(players.length / 2);
         const tally: Record<string, number> = {};
         Object.values(votes).forEach((tid) => {

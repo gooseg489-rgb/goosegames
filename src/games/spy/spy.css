@@ -36,7 +36,7 @@
 
 /* LAYOUT */
 .spy-app {
-  max-width: 560px;
+  max-width: 720px;
   margin: 0 auto;
   min-height: 100vh;
   display: flex;
@@ -44,12 +44,16 @@
 }
 
 header {
-  padding: 2rem 1.5rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   position: sticky;
   top: 0;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
 }
 
 .logo {
@@ -533,93 +537,9 @@ input[type=range] {
 }
 .setting-row label { font-size: 0.9rem; color: var(--muted); min-width: 110px; }
 .setting-row span { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; min-width: 52px; }
-/* ── Desktop layout fixes ── */
 
-/* Fix white background bleed */
+/* Global background fix */
 html, body, #root {
-  background: var(--bg);
-  color: var(--text);
+  background: #0d0d0d;
   min-height: 100vh;
-}
-
-/* Header: just room badge, no nav links */
-.spy-app header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.6rem 1.5rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  min-height: 48px;
-}
-
-/* Waiting screen: two columns on desktop */
-.waiting-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  align-items: start;
-}
-
-.waiting-col {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-/* Game screen: two columns on desktop */
-.game-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  align-items: start;
-}
-
-.game-col-left,
-.game-col-right {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.game-col-right .game-log {
-  height: calc(100vh - 280px);
-  overflow-y: auto;
-}
-
-/* Main area: full height, no scroll on desktop */
-.spy-app main {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.spy-app main .screen.active {
-  height: 100%;
-  overflow-y: auto;
-  padding: 1.5rem 2rem;
-  display: flex;
-  flex-direction: column;
-}
-
-/* On mobile: single column */
-@media (max-width: 768px) {
-  .waiting-layout,
-  .game-layout {
-    grid-template-columns: 1fr;
-  }
-  .game-col-right .game-log {
-    height: auto;
-    max-height: 200px;
-  }
-  .spy-app main .screen.active {
-    padding: 1rem;
-  }
 }

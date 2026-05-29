@@ -122,45 +122,39 @@ export default function SpyGame() {
         </Screen>
 
         <Screen id="screen-waiting" active={s.screen === "waiting"}>
-          <div className="waiting-layout">
-            {/* Левая колонка — игроки */}
-            <div className="waiting-col">
-              <h2>Ожидание игроков</h2>
-              <div className="notice">
-                Поделись ссылкой — остальные смогут войти с любого устройства.
+          <h2>Ожидание игроков</h2>
+          <div className="notice">
+            Поделись ссылкой — остальные смогут войти с любого устройства.
+          </div>
+          <div
+            className="share-url"
+            onClick={s.copyLink}
+            onKeyDown={(e) => e.key === "Enter" && s.copyLink()}
+            role="button"
+            tabIndex={0}
+          >
+            {s.shareUrl}
+          </div>
+          <p className="copy-hint">Нажми чтобы скопировать</p>
+          <hr className="divider" />
+          <div className="section-label">Игроки ({s.players.length})</div>
+          <div className="card mb1">
+            {s.players.map(([pid, p]) => (
+              <div key={pid} className="player-item">
+                <div className="player-avatar">
+                  {p.avatar || p.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="player-name">
+                  {p.name}
+                  {pid === s.myId ? " (ты)" : ""}
+                </div>
+                {p.isHost && (
+                  <span className="player-role-badge host">хост</span>
+                )}
               </div>
-              <div
-                className="share-url"
-                onClick={s.copyLink}
-                onKeyDown={(e) => e.key === "Enter" && s.copyLink()}
-                role="button"
-                tabIndex={0}
-              >
-                {s.shareUrl}
-              </div>
-              <p className="copy-hint">Нажми чтобы скопировать</p>
-              <div className="section-label">Игроки ({s.players.length})</div>
-              <div className="card">
-                {s.players.map(([pid, p]) => (
-                  <div key={pid} className="player-item">
-                    <div className="player-avatar">
-                      {p.avatar || p.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="player-name">
-                      {p.name}
-                      {pid === s.myId ? " (ты)" : ""}
-                    </div>
-                    {p.isHost && (
-                      <span className="player-role-badge host">хост</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Правая колонка — настройки и кнопки */}
-            <div className="waiting-col">
-              {s.amHost ? (
+            ))}
+          </div>
+          {s.amHost ? (
                 <>
                   <div className="card mb1">
                     <div className="section-label">Настройки</div>
@@ -246,23 +240,21 @@ export default function SpyGame() {
                       Нужно минимум 3 игрока
                     </p>
                   )}
-                </>
-              ) : (
-                <div className="notice">
-                  Ждём, пока хост запустит игру
-                  <span className="waiting-dots" />
-                </div>
-              )}
-              <button
-                type="button"
-                className="btn mt1"
-                style={{ fontSize: "1rem" }}
-                onClick={() => void s.leaveRoom()}
-              >
-                Покинуть комнату
-              </button>
-            </div>
-          </div>
+              </>
+            ) : (
+              <div className="notice">
+                Ждём, пока хост запустит игру
+                <span className="waiting-dots" />
+              </div>
+            )}
+          <button
+            type="button"
+            className="btn mt1"
+            style={{ fontSize: "1rem" }}
+            onClick={() => void s.leaveRoom()}
+          >
+            Покинуть комнату
+          </button>
         </Screen>
 
         <Screen id="screen-role" active={s.screen === "role"}>
@@ -299,9 +291,7 @@ export default function SpyGame() {
         </Screen>
 
         <Screen id="screen-game" active={s.screen === "game"}>
-          <div className="game-layout">
-            {/* Левая колонка */}
-            <div className="game-col-left">
+          <>
               <div className="timer-wrap">
                 <div className="timer-bar">
                   <div className="timer-fill" style={{ width: s.timerFill }} />
@@ -382,25 +372,21 @@ export default function SpyGame() {
                   Завершить раунд досрочно
                 </button>
               )}
-            </div>
 
-            {/* Правая колонка — журнал */}
-            <div className="game-col-right">
-              {votePhase && (
-                <div className="vote-phase-box">
-                  <div className="vp-title">⚖️ Голосование началось!</div>
-                  <div className="vp-timer">{s.votePhaseTimer}</div>
-                  <div className="vp-sub">{s.votePhaseSub}</div>
-                </div>
-              )}
-              <div className="section-label">Журнал</div>
-              <div className="game-log">
-                {s.sortedLog.map((e, i) => (
-                  <div key={i} className="log-line">{e.msg}</div>
-                ))}
-              </div>
+          {votePhase && (
+            <div className="vote-phase-box">
+              <div className="vp-title">⚖️ Голосование началось!</div>
+              <div className="vp-timer">{s.votePhaseTimer}</div>
+              <div className="vp-sub">{s.votePhaseSub}</div>
             </div>
+          )}
+          <div className="section-label">Журнал</div>
+          <div className="game-log">
+            {s.sortedLog.map((e, i) => (
+              <div key={i} className="log-line">{e.msg}</div>
+            ))}
           </div>
+          </>
         </Screen>
 
         <Screen id="screen-result" active={s.screen === "result"}>
