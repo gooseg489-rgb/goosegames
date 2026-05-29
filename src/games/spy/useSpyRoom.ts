@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   get,
   onDisconnect,
@@ -56,6 +56,7 @@ function clearSession() {
 export function useSpyRoom() {
   const [searchParams] = useSearchParams();
   const urlRoomCode = (searchParams.get("room") || "").toUpperCase();
+  const navigate = useNavigate();
 
   const [screen, setScreen] = useState<Screen>("join");
   const [joinMode, setJoinMode] = useState<"normal" | "quick">(
@@ -445,10 +446,11 @@ export function useSpyRoom() {
       subscribeRoom();
       setScreen("waiting");
       persistSession();
+      navigate(`/spy?room=${roomId}`, { replace: true });
     } catch (e) {
       showError("Ошибка: " + (e as Error).message);
     }
-  }, [myAvatar, name, persistSession, showError, subscribeRoom]);
+  }, [myAvatar, name, navigate, persistSession, showError, subscribeRoom]);
 
   const joinRoom = useCallback(
     async (code: string, playerName: string) => {
