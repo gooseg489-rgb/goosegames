@@ -523,7 +523,10 @@ export function useSpyRoom() {
 
   const hostStartGame = useCallback(async () => {
     const roomId = roomIdRef.current;
-    if (!roomId) return;
+    const myId = myIdRef.current;
+    const isHost = iAmHostRef.current;
+    if (!roomId) { alert('DEBUG: roomId пустой!'); return; }
+    if (!isHost) { alert('DEBUG: iAmHost = false! myId=' + myId); return; }
     const snap = await get(ref(db, `rooms/${roomId}/players`));
     const players = Object.entries(snap.val() || {}) as [string, Player][];
     if (players.length < 3) {
